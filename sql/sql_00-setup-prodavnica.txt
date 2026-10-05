@@ -1,0 +1,103 @@
+-- ============================================================
+-- prodavnica - setup skripta
+-- Pusti celu skriptu da resetujes bazu u pocetno stanje.
+-- PAZI: DROP brise sve postojece podatke u ove 4 tabele.
+-- ============================================================
+
+-- Redosled brisanja je obrnut od redosleda kreiranja, zbog stranih kljuceva.
+-- Ne mozes obrisati kupci dok porudzbine pokazuju na njih.
+DROP TABLE IF EXISTS stavke_porudzbine;
+DROP TABLE IF EXISTS porudzbine;
+DROP TABLE IF EXISTS proizvodi;
+DROP TABLE IF EXISTS kupci;
+
+
+CREATE TABLE kupci (
+    id SERIAL PRIMARY KEY,
+    ime TEXT NOT NULL,
+    grad TEXT,
+    datum_registracije DATE
+);
+
+CREATE TABLE proizvodi (
+    id SERIAL PRIMARY KEY,
+    naziv TEXT NOT NULL,
+    kategorija TEXT,
+    cena NUMERIC(10,2)
+);
+
+CREATE TABLE porudzbine (
+    id SERIAL PRIMARY KEY,
+    kupac_id INTEGER REFERENCES kupci(id),
+    datum DATE,
+    status TEXT
+);
+
+CREATE TABLE stavke_porudzbine (
+    id SERIAL PRIMARY KEY,
+    porudzbina_id INTEGER REFERENCES porudzbine(id),
+    proizvod_id INTEGER REFERENCES proizvodi(id),
+    kolicina INTEGER
+);
+
+
+INSERT INTO kupci (ime, grad, datum_registracije) VALUES
+('Marko Petrovic',    'Novi Sad',   '2025-01-15'),
+('Jelena Ilic',       'Beograd',    '2025-02-03'),
+('Nikola Jovanovic',  'Nis',        '2025-02-20'),
+('Ana Markovic',      'Novi Sad',   '2025-03-11'),
+('Stefan Kovacevic',  NULL,         '2025-04-02'),
+('Milica Stankovic',  'Beograd',    '2025-05-18'),
+('Vladimir Djuric',   'Subotica',   '2025-06-07'),
+('Tijana Nikolic',    'Novi Sad',   '2025-07-22');
+
+
+INSERT INTO proizvodi (naziv, kategorija, cena) VALUES
+('Tastatura mehanicka', 'Periferija',  8900.00),
+('Mis bezicni',         'Periferija',  3200.00),
+('Monitor 27"',         'Monitori',   34500.00),
+('Monitor 24"',         'Monitori',   21900.00),
+('SSD 1TB',             'Komponente', 11500.00),
+('RAM 16GB',            'Komponente',  7800.00),
+('Slusalice',           'Periferija',  5400.00),
+('Web kamera',          'Periferija',  4100.00),
+('Graficka kartica',    'Komponente', 78000.00),
+('Napajanje 650W',      'Komponente',  9200.00),
+('Stalak za laptop',    'Dodaci',      2600.00),
+('USB hub',             'Dodaci',      1900.00);
+
+
+INSERT INTO porudzbine (kupac_id, datum, status) VALUES
+(1, '2025-03-02', 'isporuceno'),
+(1, '2025-04-15', 'isporuceno'),
+(2, '2025-03-20', 'isporuceno'),
+(3, '2025-04-01', 'otkazano'),
+(2, '2025-05-05', 'isporuceno'),
+(4, '2025-05-12', 'isporuceno'),
+(1, '2025-06-01', 'u obradi'),
+(5, '2025-06-10', 'isporuceno'),
+(3, '2025-06-22', 'isporuceno'),
+(6, '2025-07-03', 'isporuceno'),
+(2, '2025-07-19', 'otkazano'),
+(4, '2025-08-01', 'isporuceno'),
+(5, '2025-08-14', NULL),
+(6, '2025-08-27', 'isporuceno'),
+(1, '2025-09-02', 'u obradi');
+
+
+INSERT INTO stavke_porudzbine (porudzbina_id, proizvod_id, kolicina) VALUES
+(1, 1, 1), (1, 2, 1),
+(2, 3, 1),
+(3, 5, 2), (3, 6, 2),
+(4, 9, 1),
+(5, 7, 1), (5, 8, 1), (5, 12, 2),
+(6, 4, 2),
+(7, 11, 1), (7, 2, 1),
+(8, 5, 1), (8, 10, 1),
+(9, 1, 1), (9, 7, 1),
+(10, 3, 2), (10, 12, 1),
+(11, 9, 1), (11, 6, 1),
+(12, 2, 3),
+(13, 4, 1), (13, 11, 2),
+(14, 5, 1), (14, 6, 1), (14, 10, 1),
+(15, 8, 1), (15, 12, 1);
